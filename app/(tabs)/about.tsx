@@ -1,47 +1,46 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   StyleSheet,
-  Image,
-  Platform,
-  Text,
   View,
-  TouchableOpacity,
-  FlatList,
+  FlatList
 } from "react-native";
-import { Link, Stack } from "expo-router";
-import { Collapsible } from "@/components/Collapsible";
-import { ExternalLink } from "@/components/ExternalLink";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
+import { Link } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import * as Linking from "expo-linking";
+
 
 interface Student {
+  id: number;
   name: string;
   age: number;
 }
 
-const students: Student[] = [
-  { name: "Bob", age: 17 },
-  { name: "Susy", age: 18 },
-  { name: "Ted", age: 18 },
-  { name: "Sarah", age: 20 },
-  { name: "Bill", age: 19 },
-  { name: "Bob", age: 17 },
-  { name: "Susy", age: 18 },
-  { name: "Ted", age: 18 },
-  { name: "Sarah", age: 20 },
-  { name: "Bill", age: 19 },
-  { name: "Bob", age: 17 },
-  { name: "Susy", age: 18 },
-  { name: "Ted", age: 18 },
-  { name: "Sarah", age: 20 },
-  { name: "Bill", age: 19 },
+const students = [
+  { id: 1, name: "Bob", age: 17 },
+  { id: 2, name: "Susy", age: 18 },
+  { id: 3, name: "Teod", age: 18 },
+  { id: 4, name: "Sarah", age: 20 },
+  { id: 5, name: "Bill", age: 19 },
+  { id: 6, name: "Bob", age: 17 },
+  { id: 7, name: "Suy", age: 18 },
+  { id: 8, name: "Tmed", age: 18 },
+  { id: 9, name: "Syrah", age: 20 },
+  { id: 10, name: "Bil", age: 19 },
+  { id: 11, name: "Bob", age: 17 },
+  { id: 12, name: "Susy", age: 18 },
+  { id: 13, name: "Ted", age: 18 },
+  { id: 14, name: "Saprah", age: 20 },
+  { id: 15, name: "Bipl", age: 19 },
 ];
 
 export default function TabThreeScreen() {
   const renderItem = ({ item }: { item: Student }) => (
-    <Link href="/profile" style={styles.link}>
+    <Link
+      href={{
+        pathname: "/profile",
+        params: { id: item.id, name: item.name, age: item.age },
+      }}
+      style={styles.link}
+    >
       <View
         style={{ flexDirection: "row", borderWidth: 2, borderColor: "lime" }}
       >
@@ -61,13 +60,7 @@ export default function TabThreeScreen() {
     </Link>
   );
   return (
-    // <ParallaxScrollView
-    //   headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
-    //   headerImage={
-    //     <Ionicons size={310} name="code-slash" style={styles.headerImage} />
-    //   }
-    // >
-    <View style={{flex:1,padding:10,marginTop:50}}>
+    <View style={{ flex: 1, padding: 10, marginTop: 50 }}>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">List Data</ThemedText>
       </ThemedView>
@@ -75,10 +68,9 @@ export default function TabThreeScreen() {
       <FlatList
         data={students}
         renderItem={renderItem}
-        keyExtractor={(item: Student) => item.name}
+        keyExtractor={(item: Student) => item.id.toString()}
       />
-      </View>
-    // </ParallaxScrollView>
+    </View>
   );
 }
 
