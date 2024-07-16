@@ -6,8 +6,6 @@ import {
 import { Link } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-
-
 interface Student {
   id: number;
   name: string;
@@ -32,7 +30,23 @@ const students = [
   { id: 15, name: "Bipl", age: 19 },
 ];
 
-export default function TabThreeScreen() {
+//this is not  duplicate name 
+const uniqueStudents : any[] = [];
+
+for (let i = 0; i < students.length; i++) {
+  let isUnique = true;
+  for (let j = 0; j < uniqueStudents.length; j++) {
+    if (students[i].name === uniqueStudents[j].name) {
+      isUnique = false;
+      break;
+    }
+  }
+  if (isUnique) {
+    uniqueStudents.push(students[i]);
+  }
+}
+
+export default function TabThreeScreen() { 
   const renderItem = ({ item }: { item: Student }) => (
     <Link
       href={{
@@ -42,18 +56,26 @@ export default function TabThreeScreen() {
       style={styles.link}
     >
       <View
-        style={{ flexDirection: "row", borderWidth: 2, borderColor: "lime" }}
+        style={{ flexDirection: "row",shadowColor: "black",
+          shadowOffset: {
+            width: 0,
+            height: 6,
+          },
+          shadowOpacity: 0.37,
+          shadowRadius: 7.49,
+          
+          elevation: 10,borderWidth:.5 , borderColor: "lime"}}
       >
-        <ThemedText type="link" style={{ color: "#D0D0D0", fontSize: 20 }}>
+        <ThemedText type="link" style={{fontSize: 20,  }}>
           Name :{" "}
         </ThemedText>
-        <ThemedText type="link" style={{ color: "#D0D0D0", fontSize: 20 }}>
+        <ThemedText type="link" style={{ fontSize: 20 }}>
           {item.name}{" "}
         </ThemedText>
-        <ThemedText type="link" style={{ color: "#D0D0D0", fontSize: 20 }}>
+        <ThemedText type="link" style={{ fontSize: 20, }}>
           Age{" "}
         </ThemedText>
-        <ThemedText type="link" style={{ color: "#D0D0D0", fontSize: 20 }}>
+        <ThemedText type="link" style={{ fontSize: 20 }}>
           {item.age}{" "}
         </ThemedText>
       </View>
@@ -66,7 +88,7 @@ export default function TabThreeScreen() {
       </ThemedView>
       <ThemedText>This Is List Page </ThemedText>
       <FlatList
-        data={students}
+        data={uniqueStudents}
         renderItem={renderItem}
         keyExtractor={(item: Student) => item.id.toString()}
       />
