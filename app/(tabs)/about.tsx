@@ -4,13 +4,15 @@ import {
   FlatList,
   TextInput,
   Button,
-  ActivityIndicator
+  ActivityIndicator,
+  TouchableOpacity
 } from "react-native";
 import React , {useState , useEffect} from "react";
 import { Link } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { supabase } from "@/supabase";
+import { Feather } from '@expo/vector-icons';
 interface Student {
   id: number;
   name: string;
@@ -69,9 +71,11 @@ export default function TabThreeScreen() {
       if (error) {
         console.error('Error fetching data:', error);
       } else {
-        setData(data); // Update state with initial data
+        setData(data.reverse()); // Update state with initial data
       }
     };
+
+
   
     fetchData(); // Call the fetch function
   
@@ -98,19 +102,42 @@ export default function TabThreeScreen() {
       .insert([
         { name, age }, // Object representing the data to insert
       ]);
-  
     if (error) {
       console.error(error);
     } else {
       setName(null);
       setAge(null);
-        setLoading(false);
+      setLoading(false);
       console.log('Data inserted:', data);
       // Clear input fields or handle success message
       
     }
   };
+
+  const handleDeleteData = async (id) => {
+    for (const item of data) {
+      console.log(item.id)
+    
+    setLoading(true); // Assuming you have a loading state variable
+  
+    const { error } = await supabase
+      .from('Student') // Replace with your table name
+      .delete()
+      .eq('id', item.id) // Specify the ID to delete
+    if (error) {
+      setLoading(false);
+      console.error(error);
+    } else {
+      setLoading(false);
+      console.log('Data deleted successfully');
+      // Update UI to reflect the deletion (e.g., remove item from a list)
+    }
+    }
+  };
+
+  //console.log(data[0].id)
   const renderItem = ({ item }: { item: Student }) => (
+    <>
     <Link
       href={{
         pathname: "/profile",
@@ -119,23 +146,28 @@ export default function TabThreeScreen() {
       style={styles.link}
     >
       <View
-        style={{ flexDirection: "row",shadowColor: "black",
+        style={{
+          flexDirection: "row",
+          shadowColor: "black",
           shadowOffset: {
             width: 0,
             height: 6,
           },
           shadowOpacity: 0.37,
           shadowRadius: 7.49,
-          
-          elevation: 10,borderWidth:.5 , borderColor: "lime"}}
+
+          elevation: 10,
+          borderWidth: 0.5,
+          borderColor: "lime",
+        }}
       >
-        <ThemedText type="link" style={{fontSize: 20,  }}>
+        <ThemedText type="link" style={{ fontSize: 20 }}>
           Name :{" "}
         </ThemedText>
         <ThemedText type="link" style={{ fontSize: 20 }}>
           {item.name}{" "}
         </ThemedText>
-        <ThemedText type="link" style={{ fontSize: 20, }}>
+        <ThemedText type="link" style={{ fontSize: 20 }}>
           Age{" "}
         </ThemedText>
         <ThemedText type="link" style={{ fontSize: 20 }}>
@@ -143,6 +175,13 @@ export default function TabThreeScreen() {
         </ThemedText>
       </View>
     </Link>
+    <TouchableOpacity
+    onPress={handleDeleteData}
+    style={[{ marginLeft:  10 }]}
+  >
+    <Feather name="trash" size={22} color={'green'} />
+  </TouchableOpacity>
+  </>
   );
   return (
     <View style={{ flex: 1, padding: 10, marginTop: 50 }}>
