@@ -12,7 +12,7 @@ import { Link } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { supabase } from "@/supabase";
-import { Feather } from '@expo/vector-icons';
+
 interface Student {
   id: number;
   name: string;
@@ -114,27 +114,6 @@ export default function TabThreeScreen() {
     }
   };
 
-  const handleDeleteData = async (id) => {
-    for (const item of data) {
-      console.log(item.id)
-    
-    setLoading(true); // Assuming you have a loading state variable
-  
-    const { error } = await supabase
-      .from('Student') // Replace with your table name
-      .delete()
-      .eq('id', item.id) // Specify the ID to delete
-    if (error) {
-      setLoading(false);
-      console.error(error);
-    } else {
-      setLoading(false);
-      console.log('Data deleted successfully');
-      // Update UI to reflect the deletion (e.g., remove item from a list)
-    }
-    }
-  };
-
   //console.log(data[0].id)
   const renderItem = ({ item }: { item: Student }) => (
     <>
@@ -175,12 +154,6 @@ export default function TabThreeScreen() {
         </ThemedText>
       </View>
     </Link>
-    <TouchableOpacity
-    onPress={handleDeleteData}
-    style={[{ marginLeft:  10 }]}
-  >
-    <Feather name="trash" size={22} color={'green'} />
-  </TouchableOpacity>
   </>
   );
   return (
