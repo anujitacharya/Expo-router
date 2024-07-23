@@ -66,12 +66,13 @@ export default function TabThreeScreen() {
     const fetchData = async () => {
       const { data, error } = await supabase
         .from('Student') // Replace with your table name
-        .select('*'); // Select all columns
+        .select('*')
+        .order('id', { ascending: false }); // Select all columns
   
       if (error) {
         console.error('Error fetching data:', error);
       } else {
-        setData(data.reverse()); // Update state with initial data
+        setData(data); // Update state with initial data
       }
     };
 
@@ -85,8 +86,8 @@ export default function TabThreeScreen() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "Student" },
         (payload) => {
-          setData((prevData) => [...prevData, payload.new]);
-          //console.log("Change received!", payload);
+          setData((prevData) => [...prevData, payload.new].reverse());
+          console.log("Change received!", payload);
         }
       )
       .subscribe();
@@ -100,8 +101,8 @@ export default function TabThreeScreen() {
     const { data, error } = await supabase
       .from('Student') // Replace with your table name
       .insert([
-        { name, age }, // Object representing the data to insert
-      ]);
+        { name: name, age: age }, // Object representing the data to insert
+      ]).select();
     if (error) {
       console.error(error);
     } else {
@@ -113,9 +114,7 @@ export default function TabThreeScreen() {
       
     }
   };
-
-  //console.log(data[0].id)
-  const renderItem = ({ item }: { item: Student }) => (
+  const renderItem = ({ item }: { item: data }) => (
     <>
     <Link
       href={{
@@ -197,7 +196,7 @@ export default function TabThreeScreen() {
       <FlatList
         data={data}
         renderItem={renderItem}
-        keyExtractor={(item: Student) => item.id.toString()}
+        keyExtractor={(item: data) => item.id.toString()}
       />
     </View>
   );

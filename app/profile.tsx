@@ -1,3 +1,4 @@
+import {create} from 'zustand';
 import React , {useState } from "react";
 import {
   StyleSheet,
@@ -8,42 +9,43 @@ import {
   ActivityIndicator,
   TouchableOpacity
 } from "react-native";
-import { Link, Stack, useRouter, useLocalSearchParams } from "expo-router";
+import { Link, Stack, useRouter, useGlobalSearchParams  } from "expo-router";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Feather } from '@expo/vector-icons';
 import { supabase } from "@/supabase";
 
-export default function ProfileScreen() {
-  const { id, name, age } = useLocalSearchParams();
-  const [loading, setLoading] = useState(false);
-//console.log(id)
-  const handleDeleteData = async () => {
-      console.log(id)
-    
-    setLoading(true); // Assuming you have a loading state variable
-  
+const useStore = create((set) => ({
+  data: [],
+  setData: (data) => set({ data }),
+  deleteData: async (id) => {
     const { error } = await supabase
       .from('Student') // Replace with your table name
       .delete()
-      .eq('id', id) // Specify the ID to delete
+      .eq('id', id);
+
     if (error) {
-      setLoading(false);
-      console.error(error);
+      console.error('Error deleting data:', error);
     } else {
-      setLoading(false);
-      console.log('Data deleted successfully');
-      // Update UI to reflect the deletion (e.g., remove item from a list)
+      setData((prevData) => prevData.filter((item) => item.id !== id));
     }
-    
-  };
-//   <TouchableOpacity
-//   onPress={handleDeleteData}
-//   style={[{ marginLeft:  10 }]}
-// >
-//   <Feather name="trash" size={22} color={'green'} />
-// </TouchableOpacity>
+  },
+}));
+
+export default function ProfileScreen() {
+  const router = useRouter();
+  const { id, name, age } = useGlobalSearchParams ();
+  const [loading, setLoading] = useState(false);
+  const { data, deleteData } = useStore();
+//console.log(id)
+const handleDeleteData = async () => {
+  setLoading(true); // Assuming you have a loading state variable
+  await deleteData(id); // Call the delete function from the store
+  setLoading(false);
+  router.back();
+  console.log('Data deleted successfully');
+};
   return (
     <>
       <Stack.Screen options={{ title: "Profile" }} />
