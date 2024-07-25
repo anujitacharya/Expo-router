@@ -5,9 +5,9 @@ import {
   TextInput,
   Button,
   ActivityIndicator,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
-import React , {useState , useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -18,7 +18,6 @@ interface Student {
   name: string;
   age: number;
 }
-
 
 // const students = [
 //   { id: 1, name: "Bob", age: 17 },
@@ -38,7 +37,7 @@ interface Student {
 //   { id: 15, name: "Bipl", age: 19 },
 // ];
 
-// //this is not  duplicate name 
+// //this is not  duplicate name
 // const uniqueStudents : any[] = [];
 
 // for (let i = 0; i < students.length; i++) {
@@ -54,10 +53,8 @@ interface Student {
 //   }
 // }
 
-
-
-export default function TabThreeScreen() { 
-  const [name, setName] = React.useState<string>('');
+export default function TabThreeScreen() {
+  const [name, setName] = React.useState<string>("");
   const [age, setAge] = React.useState<number>();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
@@ -65,21 +62,19 @@ export default function TabThreeScreen() {
   useEffect(() => {
     const fetchData = async () => {
       const { data, error } = await supabase
-        .from('Student') // Replace with your table name
-        .select('*')
-        .order('id', { ascending: false }); // Select all columns
-  
+        .from("Student") // Replace with your table name
+        .select("*")
+        .order("id", { ascending: false }); // Select all columns
+
       if (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       } else {
         setData(data); // Update state with initial data
       }
     };
 
-
-  
     fetchData(); // Call the fetch function
-  
+
     const taskListener = supabase
       .channel("public:Student")
       .on(
@@ -91,69 +86,68 @@ export default function TabThreeScreen() {
         }
       )
       .subscribe();
-  
-    return () => taskListener.unsubscribe();
-  }, []);
 
+    return () => taskListener.unsubscribe();
+  }, [data]);
 
   const handleInsertData = async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from('Student') // Replace with your table name
+      .from("Student") // Replace with your table name
       .insert([
         { name: name, age: age }, // Object representing the data to insert
-      ]).select();
+      ])
+      .select();
     if (error) {
       console.error(error);
     } else {
       setName(null);
       setAge(null);
       setLoading(false);
-      console.log('Data inserted:', data);
+      console.log("Data inserted:", data);
       // Clear input fields or handle success message
-      
     }
   };
   const renderItem = ({ item }: { item: data }) => (
     <>
-    <Link
-      href={{
-        pathname: "/profile",
-        params: { id: item.id, name: item.name, age: item.age },
-      }}
-      style={styles.link}
-    >
-      <View
-        style={{
-          flexDirection: "row",
-          shadowColor: "black",
-          shadowOffset: {
-            width: 0,
-            height: 6,
-          },
-          shadowOpacity: 0.37,
-          shadowRadius: 7.49,
-
-          elevation: 10,
-          borderWidth: 0.5,
-          borderColor: "lime",
+      <Link
+        href={{
+          pathname: "/profile",
+          params: { id: item.id, name: item.name, age: item.age },
         }}
+        style={styles.link}
       >
-        <ThemedText type="link" style={{ fontSize: 20 }}>
-          Name :{" "}
-        </ThemedText>
-        <ThemedText type="link" style={{ fontSize: 20 }}>
-          {item.name}{" "}
-        </ThemedText>
-        <ThemedText type="link" style={{ fontSize: 20 }}>
-          Age{" "}
-        </ThemedText>
-        <ThemedText type="link" style={{ fontSize: 20 }}>
-          {item.age}{" "}
-        </ThemedText>
-      </View>
-    </Link>
-  </>
+        <View
+          style={{
+            flexDirection: "row",
+            shadowColor: "black",
+            shadowOffset: {
+              width: 0,
+              height: 6,
+            },
+            shadowOpacity: 0.37,
+            shadowRadius: 7.49,
+
+            elevation: 10,
+            borderWidth: 0.5,
+            borderColor: "lime",
+          }}
+        >
+          <ThemedText type="link" style={{ fontSize: 20 }}>
+            Name :{" "}
+          </ThemedText>
+          <ThemedText type="link" style={{ fontSize: 20 }}>
+            {item.name}{" "}
+          </ThemedText>
+          <ThemedText type="link" style={{ fontSize: 20 }}>
+            Age{" "}
+          </ThemedText>
+          <ThemedText type="link" style={{ fontSize: 20 }}>
+            {item.age}{" "}
+          </ThemedText>
+        </View>
+      </Link>
+    </>
   );
   return (
     <View style={{ flex: 1, padding: 10, marginTop: 50 }}>
@@ -162,37 +156,37 @@ export default function TabThreeScreen() {
       </ThemedView>
       <ThemedText>This Is List Page </ThemedText>
       <View>
-      <TextInput
-      style={[styles.input, styles.additionalStyle]}
-        placeholder="Enter name"
-         placeholderTextColor="#ff7f50"
-        value={name}
-        onChangeText={setName}
-      />
-      <TextInput
-       style={[styles.input, styles.additionalStyle]}
-       placeholderTextColor="#ff7f50"
-       keyboardType="numeric"
-        placeholder="Enter Age"
-        value={age}
-        onChangeText={setAge}
-      />
-      <ThemedView style={styles.buttonContainer}>
-      <Button
-          title={loading ? '' : 'Insert Data'}
-          onPress={handleInsertData}
-          disabled={loading}
-          color="#841584"
+        <TextInput
+          style={[styles.input, styles.additionalStyle]}
+          placeholder="Enter name"
+          placeholderTextColor="#ff7f50"
+          value={name}
+          onChangeText={setName}
         />
-        {loading && (
-          <ActivityIndicator
-            size="small"
-            color="#ffffff"
-            style={styles.loader}
+        <TextInput
+          style={[styles.input, styles.additionalStyle]}
+          placeholderTextColor="#ff7f50"
+          keyboardType="numeric"
+          placeholder="Enter Age"
+          value={age}
+          onChangeText={setAge}
+        />
+        <ThemedView style={styles.buttonContainer}>
+          <Button
+            title={loading ? "" : "Insert Data"}
+            onPress={handleInsertData}
+            disabled={loading}
+            color="#841584"
           />
-        )}
+          {loading && (
+            <ActivityIndicator
+              size="small"
+              color="#ffffff"
+              style={styles.loader}
+            />
+          )}
         </ThemedView>
-    </View>
+      </View>
       <FlatList
         data={data}
         renderItem={renderItem}
@@ -231,28 +225,28 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     padding: 10,
     margin: 20,
-    width: '90%',
-    textAlign: 'center', // Center the text horizontally
-    textAlignVertical: 'center', // Center the text vertically (Android only)
-    fontWeight:'bold'
+    width: "90%",
+    textAlign: "center", // Center the text horizontally
+    textAlignVertical: "center", // Center the text vertically (Android only)
+    fontWeight: "bold",
   },
   additionalStyle: {
     borderRadius: 10,
-    backgroundColor: '#008080',
+    backgroundColor: "#008080",
   },
   loader: {
-    position: 'absolute',
-    left: '50%',
-    top: '50%',
+    position: "absolute",
+    left: "50%",
+    top: "50%",
     transform: [{ translateX: -10 }, { translateY: -10 }],
   },
   buttonContainer: {
-    position: 'relative',
+    position: "relative",
     borderRadius: 25,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
 });
