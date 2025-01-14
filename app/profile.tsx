@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -21,6 +21,7 @@ export default function ProfileScreen() {
     name: name || "",
     age: age || 0,
   });
+  const [students, setStudents] = useState([]); // Added students state
 
   const handleEditData = () => {
     setIsEditing(true);
@@ -32,9 +33,40 @@ export default function ProfileScreen() {
       .update({ name: editedData.name, age: editedData.age })
       .eq("id", id)
       .select();
-    console.log("Updated data:", data);
-    setIsEditing(false);
+
+    if (error) {
+      console.error("Error updating data:", error);
+    } else {
+      console.log("Updated data:", data);
+      setIsEditing(false);
+    }
   };
+
+  // Real-time subscription
+  useEffect(() => {
+    const subscription = supabase
+      .channel("edit_data")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "Student" },
+        (payload: { eventType: string; new: { id: any; }; }) => {
+          console.log("Change received:", payload);
+          if (payload.eventType === "UPDATE") {
+            setStudents((prev: any[]) =>
+              prev.map((student) =>
+                student.id === payload.new.id ? payload.new : student
+              )
+            );
+          }
+        }
+      ).subscribe((status: any) => {
+        console.log('Subscription status:', status);
+      });
+    // Cleanup subscription on component unmount
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, []);
 
   const handleDeleteData = async () => {
     Alert.alert(
@@ -63,6 +95,7 @@ export default function ProfileScreen() {
       { cancelable: false }
     );
   };
+
   return (
     <>
       <Stack.Screen options={{ title: "Profile" }} />
@@ -74,17 +107,17 @@ export default function ProfileScreen() {
               placeholder="Enter name"
               placeholderTextColor="#ff7f50"
               value={editedData.name}
-              onChangeText={(text) => {
-                setEditedData({ ...editedData, name: text });
+              onChangeText={(text: any) => {
+                setEditedData((prev: any) => ({ ...prev, name: text }));
               }}
             />
             <TextInput
               style={[styles.input, styles.additionalStyle]}
               placeholder="Enter age"
               placeholderTextColor="#ff7f50"
-              value={editedData.age}
-              onChangeText={(text) => {
-                setEditedData({ ...editedData, age: text });
+              value={editedData.age.toString()}
+              onChangeText={(text: any) => {
+                setEditedData((prev: any) => ({ ...prev, age: Number(text) }));
               }}
             />
             <TouchableOpacity onPress={handleSaveData}>
@@ -142,10 +175,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 20,
   },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
   input: {
     height: 40,
     borderColor: "gray",
@@ -153,8 +182,8 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 20,
     width: "90%",
-    textAlign: "center", // Center the text horizontally
-    textAlignVertical: "center", // Center the text vertically (Android only)
+    textAlign: "center",
+    textAlignVertical: "center",
     fontWeight: "bold",
   },
   additionalStyle: {

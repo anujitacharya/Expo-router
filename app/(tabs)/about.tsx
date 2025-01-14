@@ -80,8 +80,8 @@ export default function TabThreeScreen() {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "Student" },
-        (payload) => {
-          setData((prevData) => [...prevData, payload.new].reverse());
+        (payload: { new: any; }) => {
+          setData((prevData: any) => [...prevData, payload.new].reverse());
           console.log("Change received!", payload);
         }
       )
